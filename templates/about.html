@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}How This Works{% endblock %}
+
+{% block content %}
+<section class="checker-card about-card">
+  <h1>How This Works</h1>
+  <p>This tool reads the words in a message and compares them to patterns commonly found in scam messages that target seniors — things like urgent deadlines, requests for gift cards or wire transfers, secrecy, and impersonation of government agencies or tech companies.</p>
+  <p>It was trained on thousands of real examples of scam and legitimate messages, plus original examples grounded in the FBI's Internet Crime Complaint Center (IC3) 2025 Annual Report on elder fraud.</p>
+
+  <h2>What it can't do</h2>
+  <p>It is not perfect, and it can't call anyone to verify a message for you. Always trust your judgment — if a message asks for money, gift cards, or personal information and you weren't expecting it, call the person or organization directly using a phone number you already know is correct, not one from the message itself.</p>
+
+  {% if metrics %}
+  <h2>Model performance (demo build)</h2>
+  <p class="model-metrics">
+    {% if metrics.test %}Test accuracy: {{ (metrics.test.accuracy * 100) | round(1) }}% on {{ metrics.test.n_rows }} held-out messages.{% endif %}
+  </p>
+  {% endif %}
+
+  <a class="btn btn-primary" href="{{ url_for('index') }}">Back to the Checker</a>
+</section>
+{% endblock %}
