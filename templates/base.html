@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Scam Message Checker{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-icon" aria-hidden="true">🛡️</span>
+        <span>Scam Message Checker</span>
+      </a>
+      <div class="header-controls">
+        <button type="button" id="text-size-down" class="text-size-btn" aria-label="Make text smaller">A&minus;</button>
+        <button type="button" id="text-size-up" class="text-size-btn" aria-label="Make text bigger">A+</button>
+        <a class="header-link" href="{{ url_for('about') }}">How This Works</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <p>This tool gives you a second opinion — it is not a guarantee. If you're not sure, call a family member you trust before you send money or personal information to anyone.</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<div class="result-card result-{{ result.risk_level }}">
+  <div class="result-headline">
+    <span class="result-icon" aria-hidden="true">
+      {%- if result.risk_level == "high" -%}🚫
+      {%- elif result.risk_level == "medium" -%}⚠️
+      {%- else -%}✅{%- endif -%}
+    </span>
+    <h2 class="result-verdict">{{ result.risk_label }}</h2>
+  </div>
+
+  {% if result.likely_type %}
+  <p class="result-subtitle">This matches the pattern of a <strong>{{ result.likely_type.label }}</strong>.</p>
+  {% endif %}
+
+  {% set suspicious_sender = result.sender_signals | selectattr("type", "equalto", "suspicious") | list %}
+  {% set reassuring_sender = result.sender_signals | selectattr("type", "equalto", "reassuring") | list %}
+  {% set info_sender = result.sender_signals | selectattr("type", "equalto", "info") | list %}
+
+  <div class="result-section">
+    <h3>Why we flagged this</h3>
+    {% if result.tactics or suspicious_sender %}
+    <ul class="flag-list">
+      {% for t in result.tactics %}<li>{{ t.label }}</li>{% endfor %}
+      {% for s in suspicious_sender %}<li>{{ s.label }}</li>{% endfor %}
+    </ul>
+    {% elif reassuring_sender %}
+    <p>We didn't find common scam warning signs in the wording, and the sender looks legitimate:</p>
+    <ul class="flag-list flag-list-good">
+      {% for s in reassuring_sender %}<li>{{ s.label }}</li>{% endfor %}
+    </ul>
+    {% else %}
+    <p>We didn't find common scam warning signs in the wording. Still, if you weren't expecting this message, it's okay to double check.</p>
+    {% endif %}
+  </div>
+
+  {% if info_sender %}
+  <div class="result-section">
+    <p class="sender-note">{{ info_sender[0].label }}</p>
+  </div>
+  {% endif %}
+
+  {% if result.likely_type %}
+  <div class="result-section advice-box">
+    <h3>What to do</h3>
+    <p>{{ result.likely_type.advice }}</p>
+  </div>
+  {% endif %}
+
+  <button type="button" class="btn btn-secondary" id="check-another">Check Another Message</button>
+</div>

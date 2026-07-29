@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Scam Message Checker{% endblock %}
+
+{% block content %}
+<section class="intro">
+  <h1>Is this message a scam?</h1>
+  <p class="intro-text">Copy and paste a text, email, or what someone said on the phone below. We'll tell you if it looks safe or if it has warning signs of a scam.</p>
+</section>
+
+<section class="checker-card">
+  <form id="checker-form" method="post" action="{{ url_for('check') }}">
+    <label for="message" class="field-label">Paste or type the message here</label>
+    <textarea
+      id="message"
+      name="message"
+      class="message-box"
+      rows="8"
+      maxlength="3000"
+      placeholder="Example: Hi Grandma, it's me, I'm in trouble and need money right away, please don't tell Mom..."
+      aria-describedby="message-help"
+    >{{ submitted_text or "" }}</textarea>
+    <p id="message-help" class="field-help">You can paste as much of the message as you want.</p>
+
+    <label for="sender" class="field-label field-label-secondary">Who sent it? <span class="optional-tag">(optional)</span></label>
+    <input
+      type="text"
+      id="sender"
+      name="sender"
+      class="sender-box"
+      maxlength="200"
+      placeholder="Example: an email address like alerts@sharp.com, or a phone number"
+      value="{{ submitted_sender or '' }}"
+      aria-describedby="sender-help"
+    >
+    <p id="sender-help" class="field-help">If you know the email address or phone number it came from, add it here — it can help us tell if the sender looks legitimate.</p>
+
+    {% if error %}
+    <p class="form-error" role="alert">{{ error }}</p>
+    {% endif %}
+
+    <div class="button-row">
+      <button type="submit" class="btn btn-primary" id="check-btn">Check This Message</button>
+      <button type="button" class="btn btn-plain" id="clear-btn">Clear</button>
+    </div>
+  </form>
+
+  <div class="examples">
+    <p class="examples-label">Not sure what to try? Test it with an example:</p>
+    <div class="examples-row">
+      <button type="button" class="btn btn-example" data-example="scam">A scam example</button>
+      <button type="button" class="btn btn-example" data-example="safe">A safe example</button>
+    </div>
+  </div>
+</section>
+
+<section id="result-container" aria-live="polite">
+  {% if result %}
+    {% include "_result.html" %}
+  {% endif %}
+</section>
+{% endblock %}

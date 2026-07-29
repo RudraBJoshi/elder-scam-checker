@@ -1,0 +1,367 @@
+/* ---------------------------------------------------------------------
+   Elder Scam Checker -- senior-friendly styling.
+   Principles: large text, high contrast, big touch targets, color +
+   icon + text (never color alone) for the risk verdict, minimal clutter.
+   --------------------------------------------------------------------- */
+
+:root {
+  --font-scale: 1;
+
+  --color-bg: #f7f6f2;
+  --color-text: #1a1a1a;
+  --color-muted: #4a4a4a;
+  --color-primary: #1a5276;
+  --color-primary-dark: #123a54;
+  --color-border: #cfcac0;
+
+  --color-high-bg: #fdecea;
+  --color-high-border: #c0392b;
+  --color-high-text: #7b241c;
+
+  --color-medium-bg: #fef6e0;
+  --color-medium-border: #b9770e;
+  --color-medium-text: #7d5109;
+
+  --color-low-bg: #eafaf1;
+  --color-low-border: #1e8449;
+  --color-low-text: #145a32;
+
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  font-size: calc(19px * var(--font-scale));
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Verdana, Arial, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.55;
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+  background: var(--color-primary);
+  color: #fff;
+  padding: 0.9rem 1.25rem;
+}
+
+.site-header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.brand {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-icon { font-size: 1.7rem; }
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.text-size-btn {
+  background: #fff;
+  color: var(--color-primary-dark);
+  border: none;
+  border-radius: 8px;
+  width: 2.6rem;
+  height: 2.6rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.text-size-btn:hover { background: #e8e8e8; }
+
+.header-link {
+  color: #fff;
+  font-size: 1.05rem;
+  text-decoration: underline;
+  padding: 0.4rem 0.2rem;
+}
+
+/* ---------- Layout ---------- */
+
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 3rem;
+}
+
+.intro h1 {
+  font-size: 2.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary-dark);
+}
+
+.intro-text {
+  font-size: 1.2rem;
+  color: var(--color-muted);
+  margin-top: 0;
+}
+
+/* ---------- Checker card ---------- */
+
+.checker-card, .result-card, .about-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  margin-top: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.field-label {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.message-box {
+  width: 100%;
+  font-size: 1.2rem;
+  font-family: inherit;
+  padding: 0.9rem;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  resize: vertical;
+  min-height: 10rem;
+}
+
+.message-box:focus {
+  outline: 3px solid var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.field-help {
+  font-size: 1rem;
+  color: var(--color-muted);
+  margin: 0.5rem 0 0;
+}
+
+.field-label-secondary {
+  font-size: 1.1rem;
+  margin-top: 1.4rem;
+}
+
+.optional-tag {
+  font-weight: 400;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.sender-box {
+  width: 100%;
+  font-size: 1.1rem;
+  font-family: inherit;
+  padding: 0.75rem 0.9rem;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.sender-box:focus {
+  outline: 3px solid var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.sender-note {
+  font-size: 1.05rem;
+  color: var(--color-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.flag-list-good li {
+  color: var(--color-low-text);
+}
+
+.form-error {
+  color: var(--color-high-text);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-top: 0.75rem;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.4rem;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.9rem 1.6rem;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  min-height: 3.2rem;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--color-primary-dark); }
+
+.btn-secondary {
+  background: #fff;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  margin-top: 1.4rem;
+}
+.btn-secondary:hover { background: #eef4f8; }
+
+.btn-plain {
+  background: #fff;
+  color: var(--color-muted);
+  border-color: var(--color-border);
+}
+.btn-plain:hover { background: #f0efeb; }
+
+.btn-example {
+  background: #fff;
+  color: var(--color-primary-dark);
+  border-color: var(--color-border);
+  font-size: 1.05rem;
+  padding: 0.7rem 1.1rem;
+}
+.btn-example:hover { background: #eef4f8; }
+
+/* ---------- Examples ---------- */
+
+.examples {
+  margin-top: 1.6rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.examples-label {
+  font-size: 1.05rem;
+  color: var(--color-muted);
+  margin: 0 0 0.7rem;
+}
+
+.examples-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ---------- Result card ---------- */
+
+.result-card {
+  border-width: 3px;
+}
+
+.result-high {
+  background: var(--color-high-bg);
+  border-color: var(--color-high-border);
+}
+.result-medium {
+  background: var(--color-medium-bg);
+  border-color: var(--color-medium-border);
+}
+.result-low {
+  background: var(--color-low-bg);
+  border-color: var(--color-low-border);
+}
+
+.result-headline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.result-icon { font-size: 2.4rem; line-height: 1; }
+
+.result-verdict {
+  font-size: 1.7rem;
+  margin: 0;
+}
+
+.result-high .result-verdict { color: var(--color-high-text); }
+.result-medium .result-verdict { color: var(--color-medium-text); }
+.result-low .result-verdict { color: var(--color-low-text); }
+
+.result-subtitle {
+  font-size: 1.15rem;
+  margin: 0.6rem 0 0;
+}
+
+.result-section {
+  margin-top: 1.3rem;
+}
+
+.result-section h3 {
+  font-size: 1.2rem;
+  margin: 0 0 0.5rem;
+}
+
+.flag-list {
+  font-size: 1.1rem;
+  padding-left: 1.4rem;
+  margin: 0;
+}
+
+.flag-list li { margin-bottom: 0.35rem; }
+
+.advice-box {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+}
+
+.advice-box p { margin: 0; font-size: 1.12rem; }
+
+/* ---------- About page ---------- */
+
+.about-card h1 { color: var(--color-primary-dark); }
+.about-card h2 { font-size: 1.3rem; color: var(--color-primary-dark); }
+.about-card p { font-size: 1.12rem; }
+.model-metrics { font-style: italic; color: var(--color-muted); }
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1.25rem 2.5rem;
+  color: var(--color-muted);
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 480px) {
+  .site-header-inner { justify-content: center; text-align: center; }
+  .button-row { flex-direction: column; }
+  .btn { width: 100%; text-align: center; }
+}
