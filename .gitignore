@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+# Full 40MB original corpus -- not needed to run or retrain the shipped
+# model; only needed if rebuilding elder_focus_*.csv from scratch.
+# See data/rebuild_dataset.py.
+data/elder_scam_dataset_full.csv
