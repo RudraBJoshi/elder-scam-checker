@@ -1,0 +1,10 @@
+{
+  "validation": {
+    "accuracy": 0.9715,
+    "n_rows": 1018
+  },
+  "test": {
+    "accuracy": 0.9745,
+    "n_rows": 1018
+  }
+}
