@@ -159,6 +159,24 @@ SCAM_TYPES = {
                   "-- track your package directly through the carrier's official app or website "
                   "instead.",
     },
+    "job_scam": {
+        "label": "Fake Job or Business Opportunity",
+        # Added 2026-08-05 after a real unsolicited "sourcing agent for a
+        # pharmaceutical company" recruitment email was tested through the
+        # live app: the model already scored it 0.999 (correctly suspicious)
+        # but no category matched, so it capped at "medium" instead of
+        # "high" -- see app_build_notes.md.
+        "keywords": ["sourcing agent", "sourcing efforts", "trustworthy individual",
+                     "financial incentives", "formal agreement", "corporate offer",
+                     "full corporate offer", "name and address", "whatsapp",
+                     "hiring manager", "work from home opportunity", "no experience necessary",
+                     "shipping agent", "reshipping", "package handling"],
+        "advice": "Real employers don't recruit out of the blue by email and ask for your home "
+                  "address and phone number before describing the actual job. Don't reply with "
+                  "personal information -- independently look up the company (a real business "
+                  "should have reviews and a verifiable history), and never accept a job that "
+                  "involves receiving, forwarding, or reshipping packages or money for someone else.",
+    },
 }
 
 
