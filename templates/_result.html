@@ -1,9 +1,10 @@
+{% from "_icons.html" import icon_safe, icon_caution, icon_danger %}
 <div class="result-card result-{{ result.risk_level }}">
   <div class="result-headline">
-    <span class="result-icon" aria-hidden="true">
-      {%- if result.risk_level == "high" -%}🚫
-      {%- elif result.risk_level == "medium" -%}⚠️
-      {%- else -%}✅{%- endif -%}
+    <span class="result-icon">
+      {%- if result.risk_level == "high" -%}{{ icon_danger() }}
+      {%- elif result.risk_level == "medium" -%}{{ icon_caution() }}
+      {%- else -%}{{ icon_safe() }}{%- endif -%}
     </span>
     <h2 class="result-verdict">{{ result.risk_label }}</h2>
   </div>

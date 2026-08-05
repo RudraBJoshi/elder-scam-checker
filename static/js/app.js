@@ -14,7 +14,16 @@
   var clearBtn = document.getElementById("clear-btn");
   var checkBtn = document.getElementById("check-btn");
 
-  var ICONS = { high: "🚫", medium: "⚠️", low: "✅" };
+  // Same shapes as templates/_icons.html -- kept in sync by hand since this
+  // path renders results without a page reload (fetch), so it can't just
+  // include the Jinja macro. Shape-coded (circle/triangle/octagon), not just
+  // color-coded, matching universal road-sign conventions.
+  var ICON_SVG = {
+    low: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M7.8 12.4 L10.4 15 L16.2 8.6"/></svg>',
+    medium: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7 L22.3 20.7 H1.7 Z"/><line x1="12" y1="9.3" x2="12" y2="14.3"/><circle cx="12" cy="17.4" r="1.05" fill="currentColor" stroke="none"/></svg>',
+    high: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.8 2.5 H16.2 L21.5 7.8 V16.2 L16.2 21.5 H7.8 L2.5 16.2 V7.8 Z"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>'
+  };
+  var SPEAKER_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5 H8 L13 5 V19 L8 14.5 H4 Z"/><path d="M16.5 8.5 C18 10 18 14 16.5 15.5"/><path d="M19 6 C21.5 8.7 21.5 15.3 19 18"/></svg>';
 
   var EXAMPLES = {
     scam: "Grandma, it's me, please don't hang up. I was in a car accident and I'm at the police station. I need $1,500 for bail today but please don't tell Mom and Dad, I'm so embarrassed. Can you send it as gift cards?",
@@ -28,11 +37,11 @@
   }
 
   function renderResult(result) {
-    var icon = ICONS[result.risk_level] || "❓";
+    var icon = ICON_SVG[result.risk_level] || "";
 
     var html = '<div class="result-card result-' + result.risk_level + '">';
     html += '<div class="result-headline">';
-    html += '<span class="result-icon" aria-hidden="true">' + icon + '</span>';
+    html += '<span class="result-icon">' + icon + '</span>';
     html += '<h2 class="result-verdict">' + escapeHtml(result.risk_label) + '</h2>';
     html += '</div>';
 
@@ -80,7 +89,8 @@
     html += '<button type="button" class="btn btn-secondary" id="check-another">Check Another Message</button>';
 
     if ("speechSynthesis" in window) {
-      html += ' <button type="button" class="btn btn-plain" id="read-aloud" style="margin-top:1.4rem;">🔊 Read This Aloud</button>';
+      html += ' <button type="button" class="btn btn-plain btn-with-icon" id="read-aloud" style="margin-top:1.4rem;">' +
+        '<span class="btn-icon">' + SPEAKER_SVG + '</span> Read This Aloud</button>';
     }
 
     html += '</div>';

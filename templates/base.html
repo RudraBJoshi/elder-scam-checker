@@ -4,13 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Scam Message Checker{% endblock %}</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon-source.svg') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+  {% from "_icons.html" import shield_logo %}
   <header class="site-header">
     <div class="site-header-inner">
       <a class="brand" href="{{ url_for('index') }}">
-        <span class="brand-icon" aria-hidden="true">🛡️</span>
+        <span class="brand-icon">{{ shield_logo() }}</span>
         <span>Scam Message Checker</span>
       </a>
       <div class="header-controls">
