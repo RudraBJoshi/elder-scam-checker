@@ -28,6 +28,24 @@ Design choices, worth knowing (and worth citing in the written responses):
   hash algorithm by itself. That's why the salt is generated once, written
   to a file kept OUT of git (`.session_salt`, listed in .gitignore), and
   never logged, printed, or committed anywhere.
+
+- Deploying to a host with an ephemeral filesystem (Render's free tier,
+  for example) means a locally-generated `.session_salt` file gets wiped
+  on every redeploy/restart -- which would silently reset everyone's
+  session hash each time. To avoid that, this module checks for a
+  SESSION_SALT_HEX environment variable first, and only falls back to
+  generating/reading a local file if that's not set. Set SESSION_SALT_HEX
+  once in your hosting platform's environment variable settings (generate
+  a value with `python3 -c "import secrets; print(secrets.token_hex(32))"`)
+  and it'll survive redeploys. Local dev without that env var still works
+  exactly as before, via the file.
+
+- The usage LOG itself (logs/usage.log) still won't survive a redeploy on
+  an ephemeral host, even with a stable salt -- only the salt is designed
+  to persist. That's an accepted tradeoff for a free-tier deployment: the
+  log is genuinely useful for a stretch of usage, just don't expect it to
+  accumulate forever across every redeploy. A persistent disk (paid tier)
+  or an external log store would fix this if it's ever needed.
 """
 import datetime
 import hashlib
@@ -43,9 +61,18 @@ LOG_FILE = LOG_DIR / "usage.log"
 
 
 def _load_or_create_salt():
-    """A secret salt, generated once on first run and kept out of git.
-    Stable across restarts (so the same visitor keeps hashing to the same
-    value); secret (so the hash can't be reversed without it)."""
+    """A secret salt, stable across restarts (so the same visitor keeps
+    hashing to the same value) and secret (so the hash can't be reversed
+    without it).
+
+    Prefers the SESSION_SALT_HEX environment variable -- set this on any
+    host with an ephemeral filesystem (see module docstring) so the salt
+    survives redeploys. Falls back to a local file, generated once on
+    first run, for local development.
+    """
+    env_salt = os.environ.get("SESSION_SALT_HEX")
+    if env_salt:
+        return bytes.fromhex(env_salt)
     if SALT_FILE.exists():
         return SALT_FILE.read_bytes()
     salt = os.urandom(32)
