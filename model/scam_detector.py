@@ -170,7 +170,16 @@ SCAM_TYPES = {
                      "financial incentives", "formal agreement", "corporate offer",
                      "full corporate offer", "name and address", "whatsapp",
                      "hiring manager", "work from home opportunity", "no experience necessary",
-                     "shipping agent", "reshipping", "package handling"],
+                     "shipping agent", "reshipping", "package handling",
+                     # Added 2026-08-06 after a second real test message: a
+                     # "YouTube Channel Growth Partner" task-scam text with
+                     # the same underlying pattern (unsolicited, vague task,
+                     # unrealistic pay, contact via bare phone number) but
+                     # different specific wording -- same category, broader
+                     # keyword coverage.
+                     "channel growth", "click-through rate", "click-through rates",
+                     "daily earnings", "paid trial", "instant daily incentives",
+                     "no prior background", "spots available"],
         "advice": "Real employers don't recruit out of the blue by email and ask for your home "
                   "address and phone number before describing the actual job. Don't reply with "
                   "personal information -- independently look up the company (a real business "
