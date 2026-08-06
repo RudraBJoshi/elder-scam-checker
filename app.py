@@ -16,9 +16,11 @@ Routes:
 import os
 import pathlib
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, g
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from model.scam_detector import ScamDetector
+from usage_logger import hash_ip, log_usage
 
 BASE_DIR = pathlib.Path(__file__).parent
 MAX_MESSAGE_LENGTH = 3000  # matches the dataset's text cap (see project README)
@@ -27,14 +29,33 @@ MAX_SENDER_LENGTH = 200
 app = Flask(__name__)
 detector = ScamDetector(model_dir=BASE_DIR / "model")
 
+# When deployed behind a reverse proxy (Render, PythonAnywhere, etc.), the
+# real visitor's IP arrives in the X-Forwarded-For header, not the raw
+# socket connection Flask sees by default -- ProxyFix teaches Flask to read
+# it from there. Only turn this on once you've actually confirmed you're
+# behind a proxy you trust: blindly trusting X-Forwarded-For with no real
+# proxy in front of you means anyone can fake any "session" just by setting
+# that header themselves. Set BEHIND_PROXY=1 in the hosting platform's
+# environment variables when deploying; leave it unset for local dev.
+if os.environ.get("BEHIND_PROXY") == "1":
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
+
+
+@app.before_request
+def _compute_session_hash():
+    # See usage_logger.py for why this is a salted hash and not the raw IP.
+    g.session_hash = hash_ip(request.remote_addr)
+
 
 @app.route("/")
 def index():
+    log_usage("/", g.session_hash, outcome="page_view")
     return render_template("index.html")
 
 
 @app.route("/about")
 def about():
+    log_usage("/about", g.session_hash, outcome="page_view")
     return render_template("about.html", metrics=detector.metrics)
 
 
@@ -56,9 +77,12 @@ def check():
     wants_json = request.is_json or request.headers.get("X-Requested-With") == "fetch"
 
     if result is None:
+        log_usage("/check", g.session_hash, outcome="empty_message")
         if wants_json:
             return jsonify({"error": "empty_message"}), 400
         return render_template("index.html", error="Please paste or type a message to check.")
+
+    log_usage("/check", g.session_hash, risk_level=result["risk_level"], outcome="ok")
 
     if wants_json:
         return jsonify(result)

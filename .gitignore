@@ -5,3 +5,8 @@ __pycache__/
 # model; only needed if rebuilding elder_focus_*.csv from scratch.
 # See data/rebuild_dataset.py.
 data/elder_scam_dataset_full.csv
+# Usage-tracking secret and log (see usage_logger.py). The salt must stay
+# secret to keep the hashed IPs in the log non-reversible -- never commit
+# either of these.
+.session_salt
+logs/
