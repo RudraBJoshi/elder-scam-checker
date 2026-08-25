@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Scam Message Checker{% endblock %}</title>
+  <meta name="description" content="Paste a suspicious text, email, or call description and get a plain-language safety check, built for seniors and the family members who look out for them.">
+  <meta name="theme-color" content="#1a5276">
+  <meta property="og:title" content="Scam Message Checker">
+  <meta property="og:description" content="A plain-language scam checker for seniors: paste a message, get a clear safe/caution/danger verdict and what to do next.">
+  <meta property="og:type" content="website">
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon-source.svg') }}">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
@@ -31,6 +36,7 @@
 
   <footer class="site-footer">
     <p>This tool gives you a second opinion — it is not a guarantee. If you're not sure, call a family member you trust before you send money or personal information to anyone.</p>
+    <p class="site-credit">Built by Rudra Joshi, Del Norte High School — 2026 Congressional App Challenge, CA-50</p>
   </footer>
 
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>

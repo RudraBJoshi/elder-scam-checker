@@ -7,15 +7,42 @@
   <p>This tool reads the words in a message and compares them to patterns commonly found in scam messages that target seniors — things like urgent deadlines, requests for gift cards or wire transfers, secrecy, and impersonation of government agencies or tech companies.</p>
   <p>It was trained on thousands of real examples of scam and legitimate messages, plus original examples grounded in the FBI's Internet Crime Complaint Center (IC3) 2025 Annual Report on elder fraud.</p>
 
+  <div class="stat-row">
+    {% if metrics.test %}
+    <div class="stat-pill">
+      <span class="stat-pill-value">{{ (metrics.test.accuracy * 100) | round(1) }}%</span>
+      <span class="stat-pill-label">test accuracy</span>
+    </div>
+    {% endif %}
+    <div class="stat-pill">
+      <span class="stat-pill-value">10,178</span>
+      <span class="stat-pill-label">training examples</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-value">10</span>
+      <span class="stat-pill-label">scam categories covered</span>
+    </div>
+  </div>
+
+  <h2>Two ways we check</h2>
+  <p>Every message gets checked two ways: a statistical model trained on thousands of real messages looks at word patterns and writing style, while a separate rule-based layer checks for specific tactics scammers use — urgency, secrecy, requests for gift cards, impersonation, and more. A message is only marked "high risk" when both agree there's real evidence, not just a raw score, so an unusual-but-harmless message doesn't cause a false alarm.</p>
+
+  <h2>Scam patterns we recognize</h2>
+  <ul class="category-tag-list">
+    <li class="category-tag">Grandparent Scam</li>
+    <li class="category-tag">Government Impersonation</li>
+    <li class="category-tag">Tech Support Scam</li>
+    <li class="category-tag">Romance Scam</li>
+    <li class="category-tag">Investment Fraud</li>
+    <li class="category-tag">Gift Card / Favor Scam</li>
+    <li class="category-tag">Lottery / Sweepstakes Scam</li>
+    <li class="category-tag">Phishing / Fake Company Alert</li>
+    <li class="category-tag">Fake Package Delivery Notice</li>
+    <li class="category-tag">Fake Job or Business Opportunity</li>
+  </ul>
+
   <h2>What it can't do</h2>
   <p>It is not perfect, and it can't call anyone to verify a message for you. Always trust your judgment — if a message asks for money, gift cards, or personal information and you weren't expecting it, call the person or organization directly using a phone number you already know is correct, not one from the message itself.</p>
-
-  {% if metrics %}
-  <h2>Model performance (demo build)</h2>
-  <p class="model-metrics">
-    {% if metrics.test %}Test accuracy: {{ (metrics.test.accuracy * 100) | round(1) }}% on {{ metrics.test.n_rows }} held-out messages.{% endif %}
-  </p>
-  {% endif %}
 
   <a class="btn btn-primary" href="{{ url_for('index') }}">Back to the Checker</a>
 </section>

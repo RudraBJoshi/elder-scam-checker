@@ -10,7 +10,7 @@
   </div>
 
   {% if result.likely_type %}
-  <p class="result-subtitle">This matches the pattern of a <strong>{{ result.likely_type.label }}</strong>.</p>
+  <p class="result-subtitle">This matches the pattern of a <span class="category-chip category-chip-{{ result.risk_level }}">{{ result.likely_type.label }}</span></p>
   {% endif %}
 
   {% set suspicious_sender = result.sender_signals | selectattr("type", "equalto", "suspicious") | list %}

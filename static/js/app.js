@@ -46,8 +46,8 @@
     html += '</div>';
 
     if (result.likely_type) {
-      html += '<p class="result-subtitle">This matches the pattern of a <strong>' +
-        escapeHtml(result.likely_type.label) + '</strong>.</p>';
+      html += '<p class="result-subtitle">This matches the pattern of a <span class="category-chip category-chip-' +
+        result.risk_level + '">' + escapeHtml(result.likely_type.label) + '</span></p>';
     }
 
     var senderSignals = result.sender_signals || [];
@@ -89,7 +89,7 @@
     html += '<button type="button" class="btn btn-secondary" id="check-another">Check Another Message</button>';
 
     if ("speechSynthesis" in window) {
-      html += ' <button type="button" class="btn btn-plain btn-with-icon" id="read-aloud" style="margin-top:1.4rem;">' +
+      html += ' <button type="button" class="btn btn-plain btn-read-aloud" id="read-aloud">' +
         '<span class="btn-icon">' + SPEAKER_SVG + '</span> Read This Aloud</button>';
     }
 
@@ -150,7 +150,7 @@
 
       evt.preventDefault();
       checkBtn.disabled = true;
-      checkBtn.textContent = "Checking…";
+      checkBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Checking…';
 
       fetch(form.action, {
         method: "POST",
