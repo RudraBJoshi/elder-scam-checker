@@ -83,7 +83,8 @@
 
     if (result.likely_type) {
       html += '<div class="result-section advice-box"><h3>What to do</h3><p>' +
-        escapeHtml(result.likely_type.advice) + '</p></div>';
+        escapeHtml(result.likely_type.advice) + '</p>' +
+        '<p class="advice-tagline">Remember: Stop. Hang Up. Tell Someone. — San Diego County DA\'s Office</p></div>';
     }
 
     html += '<button type="button" class="btn btn-secondary" id="check-another">Check Another Message</button>';
@@ -114,7 +115,7 @@
       parts.push("Why we flagged this: " + flagLabels.join(". ") + ".");
     }
     if (result.likely_type) {
-      parts.push("What to do: " + result.likely_type.advice);
+      parts.push("What to do: " + result.likely_type.advice + " Remember: Stop. Hang up. Tell someone.");
     }
     var utterance = new SpeechSynthesisUtterance(parts.join(" "));
     utterance.rate = 0.95;
