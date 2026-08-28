@@ -1,4 +1,4 @@
-# Scam Message Checker
+# Elder Scam Message Checker
 
 A senior-friendly web app for the 2026 Congressional App Challenge (CA-50). A
 user pastes or types a suspicious text, email, or description of a phone call
