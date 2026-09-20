@@ -19,9 +19,10 @@ elder_scam_app/
     word_vectorizer.pkl, char_vectorizer.pkl, classifier.pkl, metrics.json  (generated)
   data/
     generate_elder_examples.py    Regenerates the synthetic elder-scam examples (seeded)
+    generate_extra_examples.py    Adds v2 legit-notice / link / scam templates to the existing splits
     fetch_real_smishing.py        Pulls in real, CC-BY-licensed smishing reports (see below)
     rebuild_dataset.py             Merges everything + does a leakage-safe grouped split
-    elder_focus_train/val/test.csv  The current dataset (8,142 / 1,018 / 1,018 rows)
+    elder_focus_train/val/test.csv  The current dataset (8,615 / 1,067 / 1,060 rows)
   templates/
     base.html, index.html, _result.html, about.html
   static/
@@ -34,8 +35,36 @@ elder_scam_app/
 
 Current numbers, on a genuinely held-out, leakage-free test set:
 
-- Validation accuracy: 97.4%
-- Test accuracy: **97.5%** (precision/recall both 0.96-0.98 for both classes)
+- Validation accuracy: 98.0%
+- Test accuracy: **98.1%** (precision/recall both 0.96-0.98 for both classes)
+
+**Accuracy improvements (latest pass).** Overall accuracy barely moves, because
+most of the dataset is easy; the gains are in the places it was weak. On a
+fresh set of unseen, hand-written elder-style messages (never used in training)
+the full pipeline went from 62% to 81-92% (the range reflects which templates
+land in the held-out split -- the set is only 26 messages, so treat it as a
+directional check, not a benchmark). Held-out legitimate formal notices went
+from 21% to about 90%. What changed:
+
+- **Legit notices:** `data/generate_extra_examples.py` adds ~35 diverse templates
+  of ordinary bank alerts, appointment/pharmacy reminders, one-time codes,
+  bills, deliveries, family texts, routine account/security emails ("you're receiving this because you signed in with Google"), and harmless links (photo albums, recipes,
+  official sites). Before this, any message containing a link scored 0.9+ as a
+  scam. Formal legit rows are also upweighted 8x in `train_model.py`.
+- **Link and sender analysis:** `scam_detector.py` now inspects URLs and the
+  sender's email domain for lookalikes of real brands (`paypa1-support.online`,
+  `medicare.gov.evil.top`), shortened links, raw-IP links, and throwaway TLDs. A
+  deceptive link/sender is concrete evidence on its own and floors the verdict
+  at "Be careful" even when the wording is bland.
+- **Weaker false-alarm evidence:** a bare brand name ("Amazon", "Medicare") or a
+  single loose category keyword no longer counts as a red flag by itself.
+- **Deliberately not done:** hiding mid-score messages that have no red flag cut
+  false alarms 35 -> 19 but missed 9 more real scams (17 -> 26). For a tool
+  protecting seniors a missed scam is worse than a "worth a second look", so
+  the safety-first behavior stays.
+- **Known remaining gaps:** romance/"favor" scams that use no trigger words
+  (e.g. "buy iTunes cards for me, I'm on an oil platform") can still score low,
+  and some legitimate transaction alerts land in "worth a second look".
 
 This looks similar to the project's original 97.7% baseline number, but it's
 a different, harder, more honest measurement — getting here involved finding

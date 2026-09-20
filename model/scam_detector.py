@@ -41,19 +41,25 @@ TACTIC_FLAGS = [
         "key": "secrecy",
         "label": "Asks you to keep it a secret",
         "keywords": ["don't tell", "do not tell", "keep this between us", "confidential",
-                     "don't call my parents", "please don't tell", "our secret"],
+                     "don't call my parents", "please don't tell", "our secret",
+                     "keep it private", "keep this private", "keep it quiet", "don't tell anyone",
+                     "do not tell anyone", "don't mention this", "do not mention this", "between us"],
     },
     {
         "key": "unusual_payment",
         "label": "Wants payment by gift card, wire transfer, or crypto",
         "keywords": ["gift card", "gift cards", "wire transfer", "moneygram", "western union",
-                     "bitcoin", "cryptocurrency", "crypto", "usdt", "redemption code"],
+                     "bitcoin", "cryptocurrency", "crypto", "usdt", "redemption code",
+                     "amazon cards", "amazon card", "itunes cards", "itunes card", "google play cards",
+                     "google play card", "apple cards", "steam cards", "target cards", "prepaid card",
+                     "prepaid cards", "read me the codes", "send me the codes", "send the codes"],
     },
     {
         "key": "authority",
         "label": "Claims to be a government agency or well-known company",
         "keywords": ["irs", "social security", "medicare", "u.s. marshals", "department of treasury",
                      "microsoft", "apple", "amazon", "norton", "geek squad", "paypal", "police",
+                     "google", "facebook", "instagram", "whatsapp", "netflix", "your bank",
                      "officer", "warrant", "arrest"],
     },
     {
@@ -75,6 +81,27 @@ TACTIC_FLAGS = [
                      "date of birth", "click the link", "click here", "log in to verify"],
     },
     {
+        "key": "account_pretext",
+        "label": "Says there is a problem with your account or device that only they can fix",
+        "keywords": [],
+        "regex": r"\b(?:fix|unlock|restore|repair|reactivate)\b[^.!?\n]{0,25}"
+                 r"\b(?:your|ur)\s+(?:account|acount|acocunt|accont|password|computer|device|phone)\b",
+    },
+    {
+        "key": "emergency_money",
+        "label": "Claims someone is in danger and demands money right away",
+        "keywords": ["kidnap", "kidnapped", "kidnapping", "kidnapper", "kidnappers", "ransom",
+                     "hostage", "they have me", "they will hurt", "i'm in danger",
+                     "i am in danger", "hurt me"],
+    },
+    {
+        "key": "money_request",
+        "label": "Asks you to send money",
+        "keywords": [],
+        "regex": r"\b(?:need|send|wire|pay|give|transfer|owe|have|get|lend|borrow|loan)\b[^.!?\n]{0,40}"
+                 r"(?:\$\s?\d|\b\d[\d,.]*\s?(?:k|grand|dollars|usd|bucks)\b)",
+    },
+    {
         "key": "remote_access",
         "label": "Asks for remote access to your computer",
         "keywords": ["remote access", "allow us access", "download teamviewer", "anydesk",
@@ -84,6 +111,15 @@ TACTIC_FLAGS = [
 
 # --- Scam categories (matches dataset's scam_type field) -----------------------
 SCAM_TYPES = {
+    "virtual_kidnapping": {
+        "label": "Emergency / Kidnapping Money Demand",
+        "keywords": ["kidnap", "kidnapped", "kidnapping", "kidnapper", "kidnappers", "ransom",
+                     "hostage", "they have me", "help me"],
+        "advice": "Do not send money. \"Virtual kidnapping\" scams use a frightening message to rush "
+                  "you into paying before you can think. Contact the person directly on a number "
+                  "you already have, and if you believe someone is truly in danger, call 911 right "
+                  "away -- real kidnappers do not ask for money by text.",
+    },
     "grandparent_scam": {
         "label": "Grandparent Scam",
         "keywords": ["grandma", "grandpa", "it's me", "bail", "accident", "jail",
@@ -189,6 +225,17 @@ SCAM_TYPES = {
 }
 
 
+GENERIC_ADVICE = ("Do not send money, gift cards, or personal information, and do not click any "
+                  "links. Contact the person or company directly using a phone number you already "
+                  "have -- not one from this message.")
+
+NEXT_STEPS = [
+    "Do not reply, click links, or send money or gift cards.",
+    "Call the person or company using a number you already have.",
+    "Tell a family member or friend you trust before you do anything.",
+]
+
+
 def _find_keyword_hits(text_lower, keywords):
     """Word-boundary-aware substring match. Plain `kw in text_lower` was
     matching short keywords inside unrelated words -- e.g. "irs" (for the
@@ -222,7 +269,104 @@ KNOWN_OFFICIAL_DOMAINS = {
     "bankofamerica.com": "Bank of America",
     "wellsfargo.com": "Wells Fargo",
     "citibank.com": "Citibank",
+    "netflix.com": "Netflix",
+    "walmart.com": "Walmart",
+    "target.com": "Target",
+    "costco.com": "Costco",
+    "capitalone.com": "Capital One",
+    "usbank.com": "U.S. Bank",
+    "verizon.com": "Verizon",
+    "att.com": "AT&T",
+    "comcast.com": "Comcast",
+    "cvs.com": "CVS",
+    "walgreens.com": "Walgreens",
+    "kaiserpermanente.org": "Kaiser Permanente",
+    "sharp.com": "Sharp HealthCare",
+    "norton.com": "Norton",
+    "mcafee.com": "McAfee",
+    "ebay.com": "eBay",
+    "dhl.com": "DHL",
+    "usa.gov": "USA.gov",
+    "va.gov": "the VA",
 }
+
+# Words that mean "this domain is trying to look like <org>" when they appear in
+# a domain that is NOT that organization's official one.
+BRAND_WORDS = {
+    "irs": "the IRS", "ssa": "Social Security", "socialsecurity": "Social Security",
+    "medicare": "Medicare", "usps": "USPS", "fedex": "FedEx", "ups": "UPS", "dhl": "DHL",
+    "amazon": "Amazon", "paypal": "PayPal", "microsoft": "Microsoft", "apple": "Apple",
+    "chase": "Chase", "wellsfargo": "Wells Fargo", "bankofamerica": "Bank of America",
+    "citibank": "Citibank", "capitalone": "Capital One", "netflix": "Netflix",
+    "walmart": "Walmart", "norton": "Norton", "mcafee": "McAfee", "geeksquad": "Geek Squad",
+    "usbank": "U.S. Bank", "verizon": "Verizon", "comcast": "Comcast",
+}
+
+URL_SHORTENERS = {"bit.ly", "tinyurl.com", "t.co", "rb.gy", "is.gd", "cutt.ly", "ow.ly",
+                  "shorturl.at", "buff.ly", "tiny.cc", "goo.gl", "rebrand.ly", "bl.ink"}
+
+# Cheap, throwaway TLDs that show up in a large share of reported smishing links.
+SUSPICIOUS_TLDS = {"top", "xyz", "click", "online", "help", "site", "live", "icu", "buzz",
+                   "tk", "cc", "support", "link", "cfd", "sbs", "info", "rest", "monster",
+                   "vip", "shop", "store", "work", "today", "cam"}
+
+_TLDS = ("com|net|org|gov|edu|us|io|co|me|ly|gl|info|biz|top|xyz|click|online|help|site|live|"
+         "icu|buzz|tk|cc|support|link|cfd|sbs|rest|monster|vip|shop|store|work|today|cam|app|"
+         "dev|page|cloud|email|security|services|solutions|center")
+URL_RE = re.compile(
+    r"(?:https?://|www\.)[^\s<>\"']+|"
+    r"\b(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:" + _TLDS + r")\b(?:/[^\s<>\"']*)?",
+    re.I,
+)
+LEET = str.maketrans({"0": "o", "1": "l", "3": "e", "5": "s", "4": "a", "@": "a", "$": "s"})
+
+
+def _host_of(token):
+    token = re.sub(r"^https?://", "", token.strip().rstrip(".,;:!?)\"'"), flags=re.I)
+    host = re.split(r"[/?#]", token, maxsplit=1)[0]
+    host = host.split("@")[-1].split(":")[0].lower()
+    return host[4:] if host.startswith("www.") else host
+
+
+def _is_official(host):
+    return any(host == d or host.endswith("." + d) for d in KNOWN_OFFICIAL_DOMAINS)
+
+
+def _domain_signals(host):
+    """Reasons a single web/email domain looks deceptive. Returns a list of
+    plain-language strings; empty means nothing concrete was found."""
+    if not host or _is_official(host):
+        return []
+    reasons = []
+    labels = host.split(".")
+    tld = labels[-1]
+    registered = ".".join(labels[-2:])
+
+    if re.fullmatch(r"\d{1,3}(?:\.\d{1,3}){3}", host):
+        return [f"The link points to a raw number address ({host}) instead of a real website name."]
+    if registered in URL_SHORTENERS or host in URL_SHORTENERS:
+        return [f"The link ({host}) is a shortened link, which hides where it really goes."]
+
+    squashed = re.sub(r"[^a-z0-9]", "", host.translate(LEET))
+    for word, org in BRAND_WORDS.items():
+        if word in squashed:
+            reasons.append(f"The address \"{host}\" is made to look like {org}, but it is not {org}'s real website.")
+            break
+    if tld in SUSPICIOUS_TLDS and not reasons:
+        reasons.append(f"The address \"{host}\" ends in \".{tld}\", a kind of address scammers often use.")
+    return reasons
+
+
+def _link_signals(text):
+    seen, signals = set(), []
+    for m in URL_RE.finditer(text):
+        host = _host_of(m.group(0))
+        if host in seen or "." not in host:
+            continue
+        seen.add(host)
+        for reason in _domain_signals(host):
+            signals.append({"type": "suspicious", "label": reason})
+    return signals
 
 FREE_EMAIL_PROVIDERS = {
     "gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "aol.com",
@@ -261,6 +405,8 @@ def _sender_signals(sender, text_lower):
                 "label": f"The sender's email domain matches {known_match}'s official domain."
             })
         else:
+            for reason in _domain_signals(domain):
+                signals.append({"type": "suspicious", "label": "Sender email: " + reason})
             if domain in FREE_EMAIL_PROVIDERS and any(k in text_lower for k in GOV_AGENCY_MENTIONS):
                 signals.append({
                     "type": "suspicious",
@@ -320,12 +466,16 @@ class ScamDetector:
                 contributions.append((feature_names[idx], weight))
 
         contributions.sort(key=lambda pair: pair[1], reverse=True)
-        return [phrase for phrase, _ in contributions[:top_n]]
+        phrases = [ph for ph, _ in contributions
+                   if re.search(r"[a-z]{4,}", ph) and not re.fullmatch(r"[\d\s,.$]+", ph)]
+        return phrases[:top_n]
 
     def _matched_tactics(self, text_lower):
         matched = []
         for tactic in TACTIC_FLAGS:
             hits = _find_keyword_hits(text_lower, tactic["keywords"])
+            if tactic.get("regex") and re.search(tactic["regex"], text_lower):
+                hits = hits or ["pattern"]
             if hits:
                 matched.append({"key": tactic["key"], "label": tactic["label"], "matched": hits[:3]})
         return matched
@@ -338,11 +488,30 @@ class ScamDetector:
                 best_key, best_score = key, len(hits)
         if best_key and best_score >= 1:
             info = SCAM_TYPES[best_key]
-            return {"key": best_key, "label": info["label"], "advice": info["advice"]}
+            return {"key": best_key, "label": info["label"], "advice": info["advice"],
+                    "hits": best_score}
         return None
 
-    @staticmethod
-    def _risk_tier(prob, has_evidence, sender_reassured):
+    # A bare brand/agency name ("Amazon", "Medicare") or a single loose category
+    # keyword appears in plenty of legitimate notices, so on its own it is not
+    # a red flag; it only counts alongside a stronger signal.
+    WEAK_TACTICS = {"authority", "money_request"}
+    # With no concrete red flag at all, a mid-range model score is too shaky to
+    # show the user as a warning -- below this we call it safe.
+    NO_EVIDENCE_SAFE_BELOW = 0.35
+
+    @classmethod
+    def _has_evidence(cls, tactics, likely_type, suspicious_signals):
+        if suspicious_signals:
+            return True
+        if any(t["key"] not in cls.WEAK_TACTICS for t in tactics):
+            return True
+        if len(tactics) >= 2:
+            return True
+        return bool(likely_type and likely_type["hits"] >= 2)
+
+    @classmethod
+    def _risk_tier(cls, prob, has_evidence, sender_reassured, tactic_count=0):
         """Turn the raw model probability into a plain-language tier.
 
         Important design choice: a "high risk / SCAM" verdict requires at least
@@ -359,14 +528,23 @@ class ScamDetector:
             # (no gift cards, threats, secrecy, etc.) actually looks wrong.
             return "low", "This looks safe"
 
+        # Several independent warning signs is strong evidence even if the model
+        # score is low, so it must not hinge on a thin margin around a cutoff.
+        if tactic_count >= 3 or (tactic_count >= 2 and prob >= 0.20):
+            return "high", "This looks like a SCAM"
+
         if prob >= 0.70:
             if has_evidence:
                 return "high", "This looks like a SCAM"
-            return "medium", "We're not fully sure — worth a second look"
+            return "medium", "This looks suspicious — check before you act"
         elif prob >= 0.35:
+            if tactic_count >= 2:
+                return "high", "This looks like a SCAM"
             if has_evidence:
                 return "medium", "Be careful — this has warning signs"
-            return "medium", "We're not fully sure — worth a second look"
+            if prob >= cls.NO_EVIDENCE_SAFE_BELOW:
+                return "medium", "This looks suspicious — check before you act"
+            return "low", "This looks safe"
         else:
             return "low", "This looks safe"
 
@@ -377,18 +555,23 @@ class ScamDetector:
 
         prob = self._predict_proba(text)
 
-        text_lower = text.lower()
+        text_lower = re.sub(r"\bur\b", "your", re.sub(r"\bu\b", "you", text.lower()))
         tactics = self._matched_tactics(text_lower)
         likely_type = self._likely_scam_type(text_lower)
-        sender_signals = _sender_signals(sender, text_lower)
+        sender_signals = _sender_signals(sender, text_lower) + _link_signals(text)
 
         suspicious_sender = [s for s in sender_signals if s["type"] == "suspicious"]
         reassuring_sender = [s for s in sender_signals if s["type"] == "reassuring"]
 
-        has_evidence = bool(tactics) or bool(likely_type) or bool(suspicious_sender)
+        has_evidence = self._has_evidence(tactics, likely_type, suspicious_sender)
         sender_reassured = bool(reassuring_sender)
 
-        risk_level, risk_label = self._risk_tier(prob, has_evidence, sender_reassured)
+        risk_level, risk_label = self._risk_tier(prob, has_evidence, sender_reassured, len(tactics))
+
+        # A lookalike/shortened link or spoofed sender domain is concrete evidence on its
+        # own, even when the message wording is bland and the model score is low.
+        if suspicious_sender and risk_level == "low":
+            risk_level, risk_label = "medium", "Be careful — this has warning signs"
 
         # Don't show flagged tactics/categories on a verdict we're calling safe --
         # a stray keyword match shouldn't contradict a "this looks safe" headline.
@@ -398,7 +581,25 @@ class ScamDetector:
 
         top_phrases = self._top_contributing_phrases(text, top_n=5) if risk_level != "low" else []
 
+        reasons = [t["label"] for t in tactics]
+        reasons += [s["label"] for s in sender_signals if s["type"] == "suspicious"]
+        if risk_level != "low" and not reasons:
+            quoted = ", ".join(f"\u201c{ph}\u201d" for ph in top_phrases[:3])
+            reasons.append("The wording is a lot like scam messages we have seen before"
+                           + (f" (for example: {quoted})." if quoted else "."))
+
+        if risk_level == "low":
+            advice = None
+            next_steps = []
+        else:
+            advice = likely_type["advice"] if likely_type else GENERIC_ADVICE
+            next_steps = list(NEXT_STEPS)
+
         return {
+            "reasons": reasons,                 # plain-language "why", always non-empty unless low risk
+            "advice": advice,                   # what to do (category-specific when known)
+            "next_steps": next_steps,           # short universal checklist for medium/high
+            "reassurance": [s["label"] for s in reassuring_sender] if risk_level == "low" else [],
             "risk_level": risk_level,          # "high" | "medium" | "low"
             "risk_label": risk_label,          # plain-language headline
             "probability": round(prob, 3),      # 0-1, model's raw confidence this is a scam

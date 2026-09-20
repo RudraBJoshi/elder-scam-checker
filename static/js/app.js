@@ -50,30 +50,20 @@
         result.risk_level + '">' + escapeHtml(result.likely_type.label) + '</span></p>';
     }
 
-    var senderSignals = result.sender_signals || [];
-    var suspiciousSender = senderSignals.filter(function (s) { return s.type === "suspicious"; });
-    var reassuringSender = senderSignals.filter(function (s) { return s.type === "reassuring"; });
-    var infoSender = senderSignals.filter(function (s) { return s.type === "info"; });
+    var infoSender = (result.sender_signals || []).filter(function (s) { return s.type === "info"; });
 
-    html += '<div class="result-section"><h3>Why we flagged this</h3>';
-    if ((result.tactics && result.tactics.length) || suspiciousSender.length) {
-      html += '<ul class="flag-list">';
-      (result.tactics || []).forEach(function (t) {
-        html += '<li>' + escapeHtml(t.label) + '</li>';
-      });
-      suspiciousSender.forEach(function (s) {
-        html += '<li>' + escapeHtml(s.label) + '</li>';
-      });
-      html += '</ul>';
-    } else if (reassuringSender.length) {
-      html += '<p>We didn’t find common scam warning signs in the wording, and the sender looks legitimate:</p>';
-      html += '<ul class="flag-list flag-list-good">';
-      reassuringSender.forEach(function (s) {
-        html += '<li>' + escapeHtml(s.label) + '</li>';
-      });
-      html += '</ul>';
+    html += '<div class="result-section">';
+    if (result.risk_level === "low") {
+      html += '<h3>What we found</h3><p>We didn’t find common scam warning signs in this message.</p>';
+      if (result.reassurance && result.reassurance.length) {
+        html += '<ul class="flag-list flag-list-good">';
+        result.reassurance.forEach(function (r) { html += '<li>' + escapeHtml(r) + '</li>'; });
+        html += '</ul>';
+      }
     } else {
-      html += '<p>We didn’t find common scam warning signs in the wording. Still, if you weren’t expecting this message, it’s okay to double check.</p>';
+      html += '<h3>Why we flagged this</h3><ul class="flag-list">';
+      (result.reasons || []).forEach(function (r) { html += '<li>' + escapeHtml(r) + '</li>'; });
+      html += '</ul>';
     }
     html += '</div>';
 
@@ -81,9 +71,11 @@
       html += '<div class="result-section"><p class="sender-note">' + escapeHtml(infoSender[0].label) + '</p></div>';
     }
 
-    if (result.likely_type) {
-      html += '<div class="result-section advice-box"><h3>What to do</h3><p>' +
-        escapeHtml(result.likely_type.advice) + '</p>' +
+    if (result.advice) {
+      html += '<div class="result-section advice-box"><h3>What to do</h3><p>' + escapeHtml(result.advice) + '</p>';
+      html += '<ul class="next-steps">';
+      (result.next_steps || []).forEach(function (step) { html += '<li>' + escapeHtml(step) + '</li>'; });
+      html += '</ul>' +
         '<p class="advice-tagline">Remember: Stop. Hang Up. Tell Someone. — San Diego County DA\'s Office</p></div>';
     }
 
@@ -108,14 +100,12 @@
     if (result.likely_type) {
       parts.push("This matches the pattern of a " + result.likely_type.label + ".");
     }
-    var senderSignals = result.sender_signals || [];
-    var flagLabels = (result.tactics || []).map(function (t) { return t.label; })
-      .concat(senderSignals.filter(function (s) { return s.type === "suspicious"; }).map(function (s) { return s.label; }));
-    if (flagLabels.length) {
-      parts.push("Why we flagged this: " + flagLabels.join(". ") + ".");
+    if (result.reasons && result.reasons.length) {
+      parts.push("Why we flagged this: " + result.reasons.join(". ") + ".");
     }
-    if (result.likely_type) {
-      parts.push("What to do: " + result.likely_type.advice + " Remember: Stop. Hang up. Tell someone.");
+    if (result.advice) {
+      parts.push("What to do: " + result.advice + " " + (result.next_steps || []).join(" ") +
+        " Remember: Stop. Hang up. Tell someone.");
     }
     var utterance = new SpeechSynthesisUtterance(parts.join(" "));
     utterance.rate = 0.95;

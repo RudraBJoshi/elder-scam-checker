@@ -13,24 +13,22 @@
   <p class="result-subtitle">This matches the pattern of a <span class="category-chip category-chip-{{ result.risk_level }}">{{ result.likely_type.label }}</span></p>
   {% endif %}
 
-  {% set suspicious_sender = result.sender_signals | selectattr("type", "equalto", "suspicious") | list %}
-  {% set reassuring_sender = result.sender_signals | selectattr("type", "equalto", "reassuring") | list %}
   {% set info_sender = result.sender_signals | selectattr("type", "equalto", "info") | list %}
 
   <div class="result-section">
-    <h3>Why we flagged this</h3>
-    {% if result.tactics or suspicious_sender %}
-    <ul class="flag-list">
-      {% for t in result.tactics %}<li>{{ t.label }}</li>{% endfor %}
-      {% for s in suspicious_sender %}<li>{{ s.label }}</li>{% endfor %}
-    </ul>
-    {% elif reassuring_sender %}
-    <p>We didn't find common scam warning signs in the wording, and the sender looks legitimate:</p>
+    {% if result.risk_level == "low" %}
+    <h3>What we found</h3>
+    <p>We didn't find common scam warning signs in this message.</p>
+    {% if result.reassurance %}
     <ul class="flag-list flag-list-good">
-      {% for s in reassuring_sender %}<li>{{ s.label }}</li>{% endfor %}
+      {% for r in result.reassurance %}<li>{{ r }}</li>{% endfor %}
     </ul>
+    {% endif %}
     {% else %}
-    <p>We didn't find common scam warning signs in the wording. Still, if you weren't expecting this message, it's okay to double check.</p>
+    <h3>Why we flagged this</h3>
+    <ul class="flag-list">
+      {% for r in result.reasons %}<li>{{ r }}</li>{% endfor %}
+    </ul>
     {% endif %}
   </div>
 
@@ -40,10 +38,13 @@
   </div>
   {% endif %}
 
-  {% if result.likely_type %}
+  {% if result.advice %}
   <div class="result-section advice-box">
     <h3>What to do</h3>
-    <p>{{ result.likely_type.advice }}</p>
+    <p>{{ result.advice }}</p>
+    <ul class="next-steps">
+      {% for step in result.next_steps %}<li>{{ step }}</li>{% endfor %}
+    </ul>
     <p class="advice-tagline">Remember: Stop. Hang Up. Tell Someone. — San Diego County DA's Office</p>
   </div>
   {% endif %}

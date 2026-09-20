@@ -624,3 +624,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   .result-card { animation: none; }
   .btn, .text-size-btn { transition: none; }
 }
+
+.advice-box .next-steps {
+  margin: var(--sp-3) 0 var(--sp-3) 1.25rem;
+  padding: 0;
+  font-size: 1.12rem;
+}
+.advice-box .next-steps li { margin-bottom: var(--sp-2); }

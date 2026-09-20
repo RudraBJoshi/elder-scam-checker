@@ -20,6 +20,7 @@ import json
 import pathlib
 
 import joblib
+import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -33,6 +34,7 @@ except ImportError:
 HERE = pathlib.Path(__file__).parent
 DATA_DIR = HERE.parent / "data"
 MODEL_DIR = HERE
+FORMAL_LEGIT_WEIGHT = 8.0
 
 
 def main():
@@ -50,8 +52,13 @@ def main():
     X_val = build_features(word_vec, char_vec, val["text"])
     X_test = build_features(word_vec, char_vec, test["text"])
 
-    clf = LogisticRegression(max_iter=1000, class_weight="balanced")
-    clf.fit(X_train, train["label"])
+    # Formal-but-legitimate notices (bank alerts, appointment reminders, bills) share
+    # vocabulary with phishing, and there are few of them relative to the rest of the
+    # data. Upweighting them cut validation false alarms on this class from 22/40 to
+    # 5/40 without adding missed scams (see README, "Accuracy improvements").
+    sample_weight = np.where(train["scam_type"].eq("legitimate_formal"), FORMAL_LEGIT_WEIGHT, 1.0)
+    clf = LogisticRegression(max_iter=2000, class_weight="balanced", C=3)
+    clf.fit(X_train, train["label"], sample_weight=sample_weight)
 
     metrics = {}
     for name, X, y in [("validation", X_val, val["label"]), ("test", X_test, test["label"])]:
