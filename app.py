@@ -63,15 +63,17 @@ def about():
 def check():
     # Accept both JSON (fetch) and form-encoded (no-JS fallback) submissions.
     if request.is_json:
-        payload = request.get_json(silent=True) or {}
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict):
+            payload = {}
         text = payload.get("message", "")
         sender = payload.get("sender", "")
     else:
         text = request.form.get("message", "")
         sender = request.form.get("sender", "")
 
-    text = text[:MAX_MESSAGE_LENGTH]
-    sender = (sender or "")[:MAX_SENDER_LENGTH]
+    text = text[:MAX_MESSAGE_LENGTH] if isinstance(text, str) else ""
+    sender = sender[:MAX_SENDER_LENGTH] if isinstance(sender, str) else ""
     result = detector.analyze(text, sender=sender)
 
     wants_json = request.is_json or request.headers.get("X-Requested-With") == "fetch"

@@ -352,6 +352,21 @@ if you're changing the source data.
   ≥0.70 with no red flag found) "Be careful" / "We're not fully sure",
   **low** (<0.35, or reassured by a verified sender) "This looks safe."
 
+## Testing
+
+Plain scripts (no pytest needed); each prints failures and can be run any time
+after retraining:
+
+```bash
+python tests/run_battery.py      # 30 scams + 30 legit messages in fresh wording, plus sender checks
+python tests/run_robustness.py   # bad input, wrong types, huge text, regex slowness, XSS, odd senders
+python tests/run_mutations.py    # scams/legit messages with caps, typos, emoji, filler, spacing changes
+```
+
+Known limits from these runs: ALL-CAPS versions of 2 of 30 legitimate messages
+get flagged (caps is a real scam signal in the training data), and 4 of 30
+scams buried in friendly filler text are missed when they only trip weak rules.
+
 ## Senior-friendly UI choices
 
 - Large base font size (19px+) with an on-page A+/A− text-size control

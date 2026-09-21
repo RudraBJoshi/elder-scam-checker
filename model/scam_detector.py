@@ -35,7 +35,7 @@ TACTIC_FLAGS = [
         "label": "Creates urgency or a countdown",
         "keywords": ["immediately", "urgent", "act now", "within 24 hours",
                      "expires today", "before it's too late", "final notice", "hurry",
-                     "act immediately", "respond immediately"],
+                     "act immediately", "respond immediately", "within the hour"],
     },
     {
         "key": "secrecy",
@@ -43,7 +43,8 @@ TACTIC_FLAGS = [
         "keywords": ["don't tell", "do not tell", "keep this between us", "confidential",
                      "don't call my parents", "please don't tell", "our secret",
                      "keep it private", "keep this private", "keep it quiet", "don't tell anyone",
-                     "do not tell anyone", "don't mention this", "do not mention this", "between us"],
+                     "do not tell anyone", "don't mention this", "do not mention this", "between us",
+                     "tell no one", "tell nobody", "don't tell a soul"],
     },
     {
         "key": "unusual_payment",
@@ -66,13 +67,16 @@ TACTIC_FLAGS = [
         "key": "threat",
         "label": "Threatens arrest, a lawsuit, or losing your account",
         "keywords": ["lawsuit", "arrest", "warrant", "suspended", "terminated", "legal action",
-                     "account will be closed", "jail"],
+                     "account will be closed", "jail", "cut off", "shut off", "disconnected",
+                     "disconnection", "power will be", "service will be terminated"],
     },
     {
         "key": "too_good",
         "label": "Promises a prize or unrealistic returns",
         "keywords": ["congratulations", "you've won", "you have won", "guaranteed return",
-                     "guaranteed returns", "zero risk", "winner", "sweepstakes", "jackpot", "free money"],
+                     "guaranteed returns", "zero risk", "winner", "sweepstakes", "jackpot", "free money",
+                     "double your money", "guaranteed profit", "guaranteed profits", "lucky winner"],
+        "regex": r"\bearn\s+\$?\d[\d,]*\s*(?:a|per|/)\s*(?:day|week|hour)\b",
     },
     {
         "key": "personal_info",
@@ -86,6 +90,16 @@ TACTIC_FLAGS = [
         "keywords": [],
         "regex": r"\b(?:fix|unlock|restore|repair|reactivate)\b[^.!?\n]{0,25}"
                  r"\b(?:your|ur)\s+(?:account|acount|acocunt|accont|password|computer|device|phone)\b",
+    },
+    {
+        "key": "callback_number",
+        "label": "Tells you to call a phone number about a problem, charge or refund",
+        "keywords": [],
+        "regex": r"(?:refund|cancel|charge[ds]?|renewed|virus|infected|technician|breach(?:ed)?|hacked|"
+                 r"suspended|arrest|fraud|overdue|unpaid)[^\n]{0,140}\b(?:call|dial|contact)\b[^\n]{0,60}"
+                 r"(?:\d{3}[\s.)-]+\d{3}[\s.-]+\d{4}|1-8\d\d)|"
+                 r"\b(?:call|dial)\b[^\n]{0,60}(?:\d{3}[\s.)-]+\d{3}[\s.-]+\d{4}|1-8\d\d)[^\n]{0,140}"
+                 r"(?:refund|cancel|charge[ds]?|renewed|virus|infected|technician|hackers?|arrest|fraud)",
     },
     {
         "key": "emergency_money",
@@ -409,7 +423,7 @@ def _sender_signals(sender, text_lower):
                 signals.append({"type": "suspicious", "label": "Sender email: " + reason})
             if domain in FREE_EMAIL_PROVIDERS and any(k in text_lower for k in GOV_AGENCY_MENTIONS):
                 signals.append({
-                    "type": "suspicious",
+                    "type": "suspicious", "severity": "high",
                     "label": f"Claims to be from a government agency, but was sent from a free "
                               f"email address ({domain}) instead of an official agency domain."
                 })
@@ -511,7 +525,7 @@ class ScamDetector:
         return bool(likely_type and likely_type["hits"] >= 2)
 
     @classmethod
-    def _risk_tier(cls, prob, has_evidence, sender_reassured, tactic_count=0):
+    def _risk_tier(cls, prob, has_evidence, sender_reassured, tactic_keys=()):
         """Turn the raw model probability into a plain-language tier.
 
         Important design choice: a "high risk / SCAM" verdict requires at least
@@ -530,7 +544,9 @@ class ScamDetector:
 
         # Several independent warning signs is strong evidence even if the model
         # score is low, so it must not hinge on a thin margin around a cutoff.
-        if tactic_count >= 3 or (tactic_count >= 2 and prob >= 0.20):
+        strong = [k for k in tactic_keys if k not in cls.WEAK_TACTICS]
+        if (len(tactic_keys) >= 3 or len(strong) >= 2
+                or (len(strong) >= 1 and "money_request" in tactic_keys)):
             return "high", "This looks like a SCAM"
 
         if prob >= 0.70:
@@ -538,8 +554,6 @@ class ScamDetector:
                 return "high", "This looks like a SCAM"
             return "medium", "This looks suspicious — check before you act"
         elif prob >= 0.35:
-            if tactic_count >= 2:
-                return "high", "This looks like a SCAM"
             if has_evidence:
                 return "medium", "Be careful — this has warning signs"
             if prob >= cls.NO_EVIDENCE_SAFE_BELOW:
@@ -555,7 +569,7 @@ class ScamDetector:
 
         prob = self._predict_proba(text)
 
-        text_lower = re.sub(r"\bur\b", "your", re.sub(r"\bu\b", "you", text.lower()))
+        text_lower = re.sub(r"\bur\b", "your", re.sub(r"\bu\b", "you", re.sub(r"\s+", " ", text.lower())))
         tactics = self._matched_tactics(text_lower)
         likely_type = self._likely_scam_type(text_lower)
         sender_signals = _sender_signals(sender, text_lower) + _link_signals(text)
@@ -566,11 +580,14 @@ class ScamDetector:
         has_evidence = self._has_evidence(tactics, likely_type, suspicious_sender)
         sender_reassured = bool(reassuring_sender)
 
-        risk_level, risk_label = self._risk_tier(prob, has_evidence, sender_reassured, len(tactics))
+        risk_level, risk_label = self._risk_tier(prob, has_evidence, sender_reassured,
+                                                 [t["key"] for t in tactics])
 
         # A lookalike/shortened link or spoofed sender domain is concrete evidence on its
         # own, even when the message wording is bland and the model score is low.
-        if suspicious_sender and risk_level == "low":
+        if any(sig.get("severity") == "high" for sig in suspicious_sender):
+            risk_level, risk_label = "high", "This looks like a SCAM"
+        elif suspicious_sender and risk_level == "low":
             risk_level, risk_label = "medium", "Be careful — this has warning signs"
 
         # Don't show flagged tactics/categories on a verdict we're calling safe --
