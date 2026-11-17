@@ -1,3 +1,5 @@
+> **Development notes.** This is the long-form history of the model and design decisions. For a quick overview and setup instructions, see the [main README](../README.md).
+
 # Elder Scam Message Checker
 
 A senior-friendly web app for the 2026 Congressional App Challenge (CA-50). A

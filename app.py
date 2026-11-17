@@ -96,5 +96,13 @@ if __name__ == "__main__":
     # macOS binds AirPlay Receiver to port 5000 by default, which collides with
     # Flask's default port. Override with PORT=5001 python3 app.py if needed,
     # or turn off AirPlay Receiver in System Settings -> General -> AirDrop & Handoff.
+    #
+    # Safe defaults: bind to localhost only and keep Flask's interactive
+    # debugger OFF (it lets anyone who can reach the port run code). Opt in
+    # for local development with FLASK_DEBUG=1; use HOST=0.0.0.0 only if you
+    # deliberately want other devices on your network to reach it. In
+    # production, run under gunicorn instead: `gunicorn app:app`.
     port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=port)
+    host = os.environ.get("HOST", "127.0.0.1")
+    debug = os.environ.get("FLASK_DEBUG") == "1"
+    app.run(debug=debug, host=host, port=port)
