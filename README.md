@@ -8,8 +8,9 @@ Built by Rudra Joshi (Del Norte High School) for the 2026 Congressional App Chal
 
 San Diego County seniors lost more than $130 million to scams in a single year ([SD County DA, Nov. 2025](https://www.sdcda.org/)). Most of those scams start with a message that *looks* ordinary. This app gives seniors and their families a quick second opinion before they click, reply, or pay.
 
-<!-- Add a screenshot: save it as docs/screenshot.png and uncomment the next line -->
-<!-- ![Screenshot of the checker](docs/screenshot.png) -->
+<p align="center">
+  <img src="docs/screenshot.png" alt="Screenshot of the checker flagging a fake IRS message as a scam, with reasons and next steps" width="480">
+</p>
 
 ## What it does
 
