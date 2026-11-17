@@ -1,10 +1,35 @@
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+
+# OS / editor
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
 # Full 40MB original corpus -- not needed to run or retrain the shipped
 # model; only needed if rebuilding elder_focus_*.csv from scratch.
 # See data/rebuild_dataset.py.
 data/elder_scam_dataset_full.csv
+
 # Usage-tracking secret and log (see usage_logger.py). The salt must stay
 # secret to keep the hashed IPs in the log non-reversible -- never commit
 # either of these.
